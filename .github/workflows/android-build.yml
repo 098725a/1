@@ -42,10 +42,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Run Gradle (assembleDebug) without local wrapper
+      - name: Run Gradle (assembleDebug)
         uses: gradle/gradle-build-action@v3
         with:
           arguments: assembleDebug
+          gradle-version: '8.0.2' # 这句是重点！指定了 Gradle 版本，就不再需要本地 gradlew 了
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4

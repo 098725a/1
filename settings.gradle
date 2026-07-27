@@ -1,0 +1,2 @@
+rootProject.name = "RealTimeFloat"
+include ":app"

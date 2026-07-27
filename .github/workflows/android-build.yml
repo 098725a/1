@@ -23,7 +23,7 @@ jobs:
           java-version: 17
 
       - name: Install Android SDK tools
-        uses: rajatjindal/setup-android@v2
+        uses: android-actions/setup-android@v3
         with:
           api-level: 34
           build-tools: "34.0.0"

@@ -1,45 +1,56 @@
-steps:
-  - name: Checkout
-    uses: actions/checkout@v4
-    with:
-      fetch-depth: 0
+name: Android Build (assembleDebug)
 
-  - name: Set up JDK 17
-    uses: actions/setup-java@v4
-    with:
-      distribution: temurin
-      java-version: 17
+on:
+  push:
+    branches:
+      - no-native
+  workflow_dispatch:
 
-  - name: Install SDK tools (sdkmanager)
-    uses: rajatjindal/setup-android@v2
-    with:
-      api-level: 34
-      build-tools: "34.0.0"
-      target: android-34
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-  - name: Accept SDK licenses
-    run: yes | sdkmanager --licenses
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
 
-  - name: Cache Gradle
-    uses: actions/cache@v4
-    with:
-      path: |
-        ~/.gradle/caches
-        ~/.gradle/wrapper
-      key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-      restore-keys: |
-        ${{ runner.os }}-gradle-
+      - name: Download Android SDK tools
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: default
+          arch: x86_64
+          emulator-options: '-no-window -no-audio'
 
-  - name: Show Java
-    run: java -version
+      - name: Accept SDK licenses
+        run: |
+          yes | sdkmanager --licenses
 
-  - name: Build debug APK
-    run: ./gradlew assembleDebug --no-daemon
-    env:
-      JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
-  - name: Upload debug APK
-    uses: actions/upload-artifact@v4
-    with:
-      name: app-debug-apk
-      path: app/build/outputs/apk/debug/app-debug.apk
+      - name: Show Java version
+        run: java -version
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk

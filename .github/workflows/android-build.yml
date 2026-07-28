@@ -45,8 +45,8 @@ jobs:
       - name: Run Gradle (assembleDebug)
         uses: gradle/gradle-build-action@v3
         with:
-          arguments: assembleDebug
-          gradle-version: '8.0.2' # 这句是重点！指定了 Gradle 版本，就不再需要本地 gradlew 了
+          arguments: assembleDebug --stacktrace
+          gradle-version: '8.2.1'
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
